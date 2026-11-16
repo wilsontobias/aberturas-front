@@ -1,0 +1,130 @@
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+  <h1 class="h3 mb-0">Productos</h1>
+  @if (!showForm()) {
+    <button type="button" class="btn btn-dark" (click)="newProduct()" data-testid="new-product">Nuevo producto</button>
+  }
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger" data-testid="products-error">{{ error() }}</div>
+}
+@if (ok()) {
+  <div class="alert alert-success" data-testid="products-ok">{{ ok() }}</div>
+}
+
+@if (showForm()) {
+  <div class="card shadow-sm mb-4" data-testid="product-form">
+    <div class="card-body p-4">
+      <h2 class="h5 mb-3">{{ editingId() ? 'Editar producto' : 'Nuevo producto' }}</h2>
+
+      @if (formError()) {
+        <div class="alert alert-danger" data-testid="form-error">{{ formError() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <label for="name" class="form-label">Nombre</label>
+            <input id="name" class="form-control" formControlName="name" maxlength="150" [class.is-invalid]="invalid('name')" />
+            <div class="invalid-feedback">Escribí el nombre del producto (hasta 150 caracteres).</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="category" class="form-label">Categoría</label>
+            <select id="category" class="form-select" formControlName="category_id" [class.is-invalid]="invalid('category_id')">
+              <option [ngValue]="null">Elegí una</option>
+              @for (c of categories(); track c.id) {
+                <option [ngValue]="c.id">{{ c.name }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">Elegí una categoría.</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="material" class="form-label">Material</label>
+            <select id="material" class="form-select" formControlName="material_id" [class.is-invalid]="invalid('material_id')">
+              <option [ngValue]="null">Elegí uno</option>
+              @for (m of materials(); track m.id) {
+                <option [ngValue]="m.id">{{ m.name }}</option>
+              }
+            </select>
+            <div class="invalid-feedback">Elegí un material.</div>
+          </div>
+          <div class="col-12">
+            <label for="description" class="form-label">Descripción (opcional)</label>
+            <textarea id="description" class="form-control" rows="2" formControlName="description"></textarea>
+          </div>
+          <div class="col-6 col-md-2">
+            <label for="width" class="form-label">Ancho (cm)</label>
+            <input id="width" type="number" class="form-control" formControlName="width_cm" [class.is-invalid]="invalid('width_cm')" />
+            <div class="invalid-feedback">Número entero, mínimo 1.</div>
+          </div>
+          <div class="col-6 col-md-2">
+            <label for="height" class="form-label">Alto (cm)</label>
+            <input id="height" type="number" class="form-control" formControlName="height_cm" [class.is-invalid]="invalid('height_cm')" />
+            <div class="invalid-feedback">Número entero, mínimo 1.</div>
+          </div>
+          <div class="col-6 col-md-2">
+            <label for="color" class="form-label">Color</label>
+            <input id="color" class="form-control" formControlName="color" maxlength="50" />
+          </div>
+          <div class="col-6 col-md-3">
+            <label for="price" class="form-label">Precio ($)</label>
+            <input id="price" type="number" class="form-control" formControlName="price" [class.is-invalid]="invalid('price')" />
+            <div class="invalid-feedback">Escribí un precio válido (0 o más).</div>
+          </div>
+          <div class="col-12 col-md-3">
+            <label for="stock" class="form-label">Stock</label>
+            <input id="stock" type="number" class="form-control" formControlName="stock" [class.is-invalid]="invalid('stock')" />
+            <div class="invalid-feedback">Número entero, 0 o más.</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-dark" [disabled]="saving()" data-testid="product-save">{{ saving() ? 'Guardando…' : 'Guardar' }}</button>
+          <button type="button" class="btn btn-outline-secondary" (click)="closeForm()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (loading()) {
+  <p class="text-secondary">Cargando…</p>
+} @else if (products().length === 0) {
+  <div class="alert alert-light border">No hay productos activos.</div>
+} @else {
+  <div class="table-responsive bg-white border rounded">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Categoría / material</th>
+          <th class="text-end">Medidas</th>
+          <th class="text-end">Precio</th>
+          <th class="text-end">Stock</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of products(); track p.id) {
+          <tr data-testid="product-row">
+            <td>{{ p.name }}</td>
+            <td class="small">{{ categoryName(p.category_id) }} · {{ materialName(p.material_id) }}</td>
+            <td class="text-end">{{ p.width_cm }} × {{ p.height_cm }} cm</td>
+            <td class="text-end">{{ +p.price | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td class="text-end">{{ p.stock }}</td>
+            <td class="text-end">
+              @if (deactivatingId() === p.id) {
+                <span class="small me-1">¿Desactivar?</span>
+                <button type="button" class="btn btn-sm btn-danger" (click)="deactivate(p)" data-testid="deactivate-yes">Sí</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="deactivatingId.set(null)">No</button>
+              } @else {
+                <button type="button" class="btn btn-sm btn-outline-dark me-1" (click)="edit(p)" data-testid="edit-product">Editar</button>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="askDeactivate(p)" data-testid="deactivate-product">Desactivar</button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

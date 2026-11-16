@@ -1,0 +1,43 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-3">Ingresar</h1>
+
+        @if (error()) {
+          <div class="alert alert-danger" data-testid="login-error">{{ error() }}</div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input id="email" type="email" class="form-control" formControlName="email" autocomplete="username" [class.is-invalid]="errorOf('email')" />
+            <div class="invalid-feedback">{{ errorOf('email') }}</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <input id="password" type="password" class="form-control" formControlName="password" autocomplete="current-password" [class.is-invalid]="errorOf('password')" />
+            <div class="invalid-feedback">{{ errorOf('password') }}</div>
+          </div>
+
+          <button type="submit" class="btn btn-dark w-100" [disabled]="sending()">
+            {{ sending() ? 'Ingresando…' : 'Ingresar' }}
+          </button>
+        </form>
+
+        <div class="d-flex align-items-center my-3 text-secondary small">
+          <hr class="flex-grow-1 m-0" /><span class="px-2">o</span><hr class="flex-grow-1 m-0" />
+        </div>
+        <a [href]="googleUrl" class="btn btn-outline-dark w-100" data-testid="google-button">
+          <svg width="18" height="18" viewBox="0 0 48 48" class="me-2 align-text-bottom" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.5-4.1 7-10.2 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+          Continuar con Google
+        </a>
+
+        <p class="small text-secondary mt-3 mb-0">
+          ¿No tenés cuenta? <a routerLink="/register">Registrate</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

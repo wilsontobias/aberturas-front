@@ -1,0 +1,75 @@
+<h1 class="h3 mb-3">Mi carrito</h1>
+
+@if (cart.lines().length === 0) {
+  <div class="alert alert-light border" data-testid="cart-empty">
+    Todavía no agregaste productos. <a routerLink="/">Ir al catálogo</a>
+  </div>
+} @else {
+  <div class="row g-4">
+    <div class="col-12 col-lg-8">
+      <div class="table-responsive bg-white border rounded">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="text-end">Precio</th>
+              <th style="width: 110px">Cantidad</th>
+              <th class="text-end">Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (line of cart.lines(); track line.product.id) {
+              <tr data-testid="cart-line">
+                <td>
+                  <a [routerLink]="['/products', line.product.id]">{{ line.product.name }}</a>
+                  @if (line.product.stock < line.quantity) {
+                    <div class="small text-warning-emphasis">Se fabrica a pedido</div>
+                  }
+                </td>
+                <td class="text-end">{{ +line.product.price | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</td>
+                <td>
+                  <input
+                    type="number"
+                    class="form-control form-control-sm"
+                    min="1"
+                    max="100"
+                    [ngModel]="line.quantity"
+                    (ngModelChange)="cart.setQuantity(line.product.id, $event)"
+                    [attr.aria-label]="'Cantidad de ' + line.product.name"
+                  />
+                </td>
+                <td class="text-end">{{ +line.product.price * line.quantity | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</td>
+                <td class="text-end">
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="cart.remove(line.product.id)">Quitar</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h5">Resumen</h2>
+          <dl class="row mb-2">
+            <dt class="col-7 fw-normal">Total</dt>
+            <dd class="col-5 text-end fw-semibold" data-testid="cart-total">{{ cart.total() | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd>
+            <dt class="col-7 fw-normal">Seña ({{ cart.depositPercentage() }} %)</dt>
+            <dd class="col-5 text-end" data-testid="cart-deposit">{{ cart.depositAmount() | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd>
+            <dt class="col-7 fw-normal">Saldo al recibir</dt>
+            <dd class="col-5 text-end">{{ cart.balanceAmount() | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd>
+          </dl>
+          <p class="small text-secondary">
+            {{ cart.requiresManufacturing() ? 'Hay productos a fabricar: la seña es del 50 %.' : 'Todo sale de stock: la seña es del 10 %.' }}
+            Los montos finales los confirma el sistema al crear el pedido.
+          </p>
+          <a routerLink="/checkout" class="btn btn-dark w-100" data-testid="go-checkout">Continuar con el pedido</a>
+          <button type="button" class="btn btn-link w-100 mt-1" (click)="cart.clear()">Vaciar carrito</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

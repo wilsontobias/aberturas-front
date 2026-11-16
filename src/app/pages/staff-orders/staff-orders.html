@@ -1,0 +1,64 @@
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+  <h1 class="h3 mb-0">Pedidos</h1>
+
+  <select class="form-select w-auto" [(ngModel)]="status" (ngModelChange)="changeFilter()" aria-label="Filtrar por estado" data-testid="status-filter">
+    <option value="">Todos los estados</option>
+    @for (s of statuses; track s) {
+      <option [value]="s">{{ label(s) }}</option>
+    }
+  </select>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger" data-testid="staff-error">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <p class="text-secondary">Cargando…</p>
+} @else if (list().length === 0 && !error()) {
+  <div class="alert alert-light border" data-testid="staff-empty">No hay pedidos con ese filtro.</div>
+} @else {
+  <div class="table-responsive bg-white border rounded">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th>N.º</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Localidad</th>
+          <th class="text-end">Total</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of list(); track order.id) {
+          <tr data-testid="staff-row">
+            <td>{{ order.id }}</td>
+            <td>{{ order.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              {{ customerName(order) }}
+              @if (order.user?.customer_profile?.phone_1) {
+                <div class="small text-secondary">{{ order.user?.customer_profile?.phone_1 }}</div>
+              }
+            </td>
+            <td>{{ order.locality?.name }}</td>
+            <td class="text-end">{{ +order.total | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</td>
+            <td><span class="badge" [class]="color(order.status?.name)">{{ label(order.status?.name) }}</span></td>
+            <td class="text-end"><a [routerLink]="['/orders', order.id]" class="btn btn-sm btn-outline-dark">Ver</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (pagination(); as p) {
+    <div class="d-flex align-items-center justify-content-between mt-3">
+      <span class="small text-secondary" data-testid="page-info">Página {{ p.current_page }} de {{ p.last_page }} · {{ p.total }} pedidos</span>
+      <div class="btn-group">
+        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="p.current_page <= 1" (click)="goTo(p.current_page - 1)">Anterior</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="p.current_page >= p.last_page" (click)="goTo(p.current_page + 1)" data-testid="next-page">Siguiente</button>
+      </div>
+    </div>
+  }
+}

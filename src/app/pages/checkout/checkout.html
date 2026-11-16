@@ -1,0 +1,130 @@
+@if (createdOrder(); as order) {
+  <div class="card shadow-sm" data-testid="order-created">
+    <div class="card-body p-4">
+      <h1 class="h4 text-success">¡Pedido creado!</h1>
+      <p>
+        Tu pedido <strong data-testid="order-number">N.º {{ order.id }}</strong> quedó pendiente de pago.
+        Para confirmarlo, hacé la transferencia de la seña y subí el comprobante.
+      </p>
+
+      <dl class="row mb-3">
+        <dt class="col-sm-4 fw-normal">Total</dt>
+        <dd class="col-sm-8">{{ +order.total | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd>
+        <dt class="col-sm-4 fw-normal">Seña a pagar ({{ order.deposit_percentage }} %)</dt>
+        <dd class="col-sm-8 fw-semibold" data-testid="order-deposit">{{ +order.deposit_amount | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd>
+        <dt class="col-sm-4 fw-normal">Saldo al recibir</dt>
+        <dd class="col-sm-8">{{ +order.balance_amount | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</dd>
+        <dt class="col-sm-4 fw-normal">Entrega en</dt>
+        <dd class="col-sm-8">{{ order.street }} {{ order.street_number }}, {{ order.locality?.name }}</dd>
+      </dl>
+
+      <p class="small text-secondary">
+        La fecha estimada de envío se asigna cuando se aprueba tu seña.
+        {{ order.requires_manufacturing ? 'Como hay productos a fabricar, el envío demora unas 3 semanas más.' : '' }}
+      </p>
+
+      <a [routerLink]="['/orders', order.id]" class="btn btn-dark" data-testid="go-order">Pagar la seña</a>
+      <a routerLink="/" class="btn btn-outline-dark ms-2">Volver al catálogo</a>
+    </div>
+  </div>
+} @else if (cart.lines().length === 0) {
+  <div class="alert alert-light border">
+    No tenés productos en el carrito. <a routerLink="/">Ir al catálogo</a>
+  </div>
+} @else if (!auth.can('create_orders')) {
+  <div class="alert alert-warning" data-testid="no-permission">Tu cuenta no tiene permiso para crear pedidos.</div>
+} @else {
+  <h1 class="h3 mb-3">Confirmar pedido</h1>
+
+  <div class="row g-4">
+    <div class="col-12 col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h5 mb-3">Dirección de entrega</h2>
+
+          @if (error()) {
+            <div class="alert alert-danger" data-testid="checkout-error">{{ error() }}</div>
+          }
+
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="province" class="form-label">Provincia</label>
+                <select id="province" class="form-select" formControlName="province_id" [class.is-invalid]="errorOf('province_id')">
+                  <option [ngValue]="null">Elegí una provincia</option>
+                  @for (province of provinces(); track province.id) {
+                    <option [ngValue]="province.id">{{ province.name }}</option>
+                  }
+                </select>
+                <div class="invalid-feedback">{{ errorOf('province_id') }}</div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="locality" class="form-label">Localidad</label>
+                <select id="locality" class="form-select" formControlName="locality_id" [class.is-invalid]="errorOf('locality_id')">
+                  <option [ngValue]="null">Elegí una localidad</option>
+                  @for (locality of localities(); track locality.id) {
+                    <option [ngValue]="locality.id">{{ locality.name }}</option>
+                  }
+                </select>
+                <div class="invalid-feedback">{{ errorOf('locality_id') }}</div>
+              </div>
+
+              <div class="col-md-8">
+                <label for="street" class="form-label">Calle</label>
+                <input id="street" class="form-control" formControlName="street" [class.is-invalid]="errorOf('street')" />
+                <div class="invalid-feedback">{{ errorOf('street') }}</div>
+              </div>
+
+              <div class="col-md-4">
+                <label for="street_number" class="form-label">Número</label>
+                <input id="street_number" class="form-control" formControlName="street_number" [class.is-invalid]="errorOf('street_number')" />
+                <div class="invalid-feedback">{{ errorOf('street_number') }}</div>
+              </div>
+
+              <div class="col-12">
+                <label for="address_notes" class="form-label">Referencia (opcional)</label>
+                <input id="address_notes" class="form-control" formControlName="address_notes" placeholder="Piso, depto, entre calles…" [class.is-invalid]="errorOf('address_notes')" />
+                <div class="invalid-feedback">{{ errorOf('address_notes') }}</div>
+              </div>
+            </div>
+
+            @if (serverErrors()['items']) {
+              <div class="alert alert-danger mt-3 mb-0">{{ serverErrors()['items'][0] }}</div>
+            }
+
+            <button type="submit" class="btn btn-dark w-100 mt-4" [disabled]="sending()" data-testid="confirm-order">
+              {{ sending() ? 'Creando pedido…' : 'Confirmar pedido' }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h5">Tu pedido</h2>
+          <ul class="list-unstyled small">
+            @for (line of cart.lines(); track line.product.id) {
+              <li class="d-flex justify-content-between">
+                <span>{{ line.quantity }} × {{ line.product.name }}</span>
+                <span>{{ +line.product.price * line.quantity | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+              </li>
+            }
+          </ul>
+          <hr />
+          <div class="d-flex justify-content-between fw-semibold">
+            <span>Total</span>
+            <span>{{ cart.total() | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>Seña ({{ cart.depositPercentage() }} %)</span>
+            <span>{{ cart.depositAmount() | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+          </div>
+          <p class="small text-secondary mt-2 mb-0">Los montos finales los confirma el sistema al crear el pedido.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

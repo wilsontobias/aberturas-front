@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" role="img" aria-label="Ventana de PVC con doble vidrio"><defs>
+<linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1ebe2"/><stop offset="1" stop-color="#e3d9cb"/></linearGradient>
+<linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfe8f5"/><stop offset="1" stop-color="#8fb9d3"/></linearGradient>
+<linearGradient id="alu" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b9bec4"/><stop offset="0.5" stop-color="#dfe3e7"/><stop offset="1" stop-color="#a9afb6"/></linearGradient>
+<linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9b6a3f"/><stop offset="0.5" stop-color="#b98550"/><stop offset="1" stop-color="#8d5f37"/></linearGradient>
+<linearGradient id="woodd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d5230"/><stop offset="1" stop-color="#6a4326"/></linearGradient>
+</defs><rect width="400" height="280" fill="url(#wall)"/><rect y="248" width="400" height="32" fill="#cfc4b4"/><rect y="248" width="400" height="3" fill="#bfb3a1"/><ellipse cx="200" cy="236" rx="130" ry="6" fill="#000" opacity=".12"/>
+<rect x="70" y="40" width="260" height="184" rx="6" fill="#fbfbfb" stroke="#c9ccd0" stroke-width="2"/>
+<rect x="84" y="54" width="232" height="156" rx="3" fill="#eef0f2" stroke="#c9ccd0"/>
+<rect x="92" y="62" width="104" height="140" fill="url(#glass)" stroke="#d7dade" stroke-width="3"/><g clip-path="url(#c9262)"><clipPath id="c9262"><rect x="92" y="62" width="104" height="140"/></clipPath><polygon points="107.6,202 138.8,62 154.4,62 123.2,202" fill="#fff" opacity=".35"/><polygon points="149.2,202 175.2,62 183.51999999999998,62 157.51999999999998,202" fill="#fff" opacity=".22"/></g>
+<rect x="204" y="62" width="104" height="140" fill="url(#glass)" stroke="#d7dade" stroke-width="3"/><g clip-path="url(#c20462)"><clipPath id="c20462"><rect x="204" y="62" width="104" height="140"/></clipPath><polygon points="219.6,202 250.8,62 266.4,62 235.2,202" fill="#fff" opacity=".35"/><polygon points="261.2,202 287.2,62 295.52,62 269.52,202" fill="#fff" opacity=".22"/></g>
+<rect x="98" y="68" width="92" height="128" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>
+<rect x="210" y="68" width="92" height="128" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>
+<rect x="194" y="104" width="8" height="34" rx="3" fill="#9aa0a6"/>
+<rect x="60" y="224" width="280" height="12" rx="3" fill="#d9d2c6" stroke="#b9ae9d"/></svg>

@@ -1,0 +1,113 @@
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+  <h1 class="h3 mb-0">Usuarios</h1>
+  <div class="d-flex flex-wrap gap-2">
+    <input class="form-control w-auto" placeholder="Buscar por nombre o email" [ngModel]="search()" (ngModelChange)="search.set($event)" aria-label="Buscar" data-testid="user-search" />
+    <select class="form-select w-auto" [ngModel]="roleFilter()" (ngModelChange)="roleFilter.set($event)" aria-label="Rol">
+      <option value="">Todos los roles</option>
+      <option value="SuperAdmin">Super administrador</option>
+      <option value="Administrator">Administrador</option>
+      <option value="OperationalUser">Usuario</option>
+    </select>
+    <select class="form-select w-auto" [ngModel]="typeFilter()" (ngModelChange)="typeFilter.set($event)" aria-label="Tipo">
+      <option value="">Todos los tipos</option>
+      <option value="customer">Cliente</option>
+      <option value="seller">Vendedor</option>
+    </select>
+    <select class="form-select w-auto" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)" aria-label="Estado">
+      <option value="">Activos e inactivos</option>
+      <option value="1">Activos</option>
+      <option value="0">Desactivados</option>
+    </select>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+}
+@if (actionOk()) {
+  <div class="alert alert-success" data-testid="admin-ok">{{ actionOk() }}</div>
+}
+@if (actionError()) {
+  <div class="alert alert-danger" data-testid="admin-error">{{ actionError() }}</div>
+}
+
+@if (pending()) {
+  <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2" data-testid="confirm-bar">
+    <span>{{ confirmText() }}</span>
+    <span class="d-flex gap-2">
+      <button type="button" class="btn btn-sm btn-dark" (click)="confirm()" data-testid="confirm-yes">Sí, confirmar</button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" (click)="cancelAsk()">No</button>
+    </span>
+  </div>
+}
+
+@if (loading()) {
+  <p class="text-secondary">Cargando…</p>
+} @else if (filtered().length === 0) {
+  <div class="alert alert-light border">No hay usuarios con ese filtro.</div>
+} @else {
+  <div class="table-responsive bg-white border rounded">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Rol</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of filtered(); track user.id) {
+          <tr data-testid="user-row">
+            <td>
+              {{ user.name }}
+              <div class="small text-secondary">{{ user.email }}</div>
+            </td>
+            <td>
+              {{ roleText(roleName(user)) }}
+              @if (user.user_role.is_owner) {
+                <span class="badge text-bg-dark ms-1">Propietario</span>
+              }
+            </td>
+            <td>{{ typeText(user.user_role.user_type?.name) }}</td>
+            <td>
+              <span class="badge" [class.text-bg-success]="isActive(user)" [class.text-bg-secondary]="!isActive(user)">
+                {{ isActive(user) ? 'Activo' : 'Desactivado' }}
+              </span>
+            </td>
+            <td>
+              <div class="d-flex flex-wrap gap-1">
+                @if (canToggle(user)) {
+                  <button type="button" class="btn btn-sm btn-outline-dark" (click)="ask(user, isActive(user) ? 'deactivate' : 'activate')" [disabled]="busy()" data-testid="toggle-user">
+                    {{ isActive(user) ? 'Desactivar' : 'Activar' }}
+                  </button>
+                }
+                @if (canEditPermissions(user)) {
+                  <a [routerLink]="['/admin/users', user.id, 'permissions']" class="btn btn-sm btn-outline-dark" data-testid="perm-link">Permisos</a>
+                }
+                @if (canChangeType(user)) {
+                  <button type="button" class="btn btn-sm btn-outline-dark" (click)="ask(user, user.user_role.user_type?.name === 'seller' ? 'makeCustomer' : 'makeSeller')" [disabled]="busy()" data-testid="change-type">
+                    Pasar a {{ user.user_role.user_type?.name === 'seller' ? 'cliente' : 'vendedor' }}
+                  </button>
+                }
+                @if (canGrantAdmin(user)) {
+                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="ask(user, 'grantAdmin')" [disabled]="busy()" data-testid="grant-admin">Hacer administrador</button>
+                }
+                @if (canRevokeAdmin(user)) {
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="ask(user, 'revokeAdmin')" [disabled]="busy()" data-testid="revoke-admin">Quitar administrador</button>
+                }
+                @if (canGrantOwner(user)) {
+                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="ask(user, 'grantOwner')" [disabled]="busy()" data-testid="grant-owner">Hacer propietario</button>
+                }
+                @if (canRevokeOwner(user)) {
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="ask(user, 'revokeOwner')" [disabled]="busy()" data-testid="revoke-owner">Quitar propietario</button>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

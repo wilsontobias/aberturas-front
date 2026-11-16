@@ -1,0 +1,67 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand fw-semibold" routerLink="/">Aberturas</a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainMenu"
+      aria-controls="mainMenu"
+      aria-expanded="false"
+      aria-label="Mostrar el menú"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainMenu">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Catálogo</a>
+        </li>
+        @if (auth.isStaff()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/staff/orders" routerLinkActive="active" data-testid="staff-link">Pedidos</a>
+          </li>
+        }
+        @if (auth.isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/users" routerLinkActive="active" data-testid="admin-users-link">Usuarios</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/products" routerLinkActive="active" data-testid="admin-products-link">Productos</a>
+          </li>
+        }
+      </ul>
+
+      <ul class="navbar-nav align-items-lg-center gap-lg-2">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/cart" routerLinkActive="active" data-testid="cart-link">
+            Carrito
+            @if (cart.count() > 0) {
+              <span class="badge text-bg-light ms-1" data-testid="cart-count">{{ cart.count() }}</span>
+            }
+          </a>
+        </li>
+        @if (auth.isLoggedIn()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/orders" routerLinkActive="active" data-testid="orders-link">Mis pedidos</a>
+          </li>
+          <li class="nav-item">
+            <span class="navbar-text" data-testid="user-name">{{ auth.user()?.name }}</span>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="btn btn-outline-light btn-sm" (click)="logout()">Cerrar sesión</button>
+          </li>
+        } @else {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active">Ingresar</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-light btn-sm" routerLink="/register">Registrarme</a>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

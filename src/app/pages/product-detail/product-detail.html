@@ -1,0 +1,55 @@
+<a routerLink="/" class="small">&larr; Volver al catálogo</a>
+
+@if (loading()) {
+  <p class="text-secondary mt-3">Cargando…</p>
+} @else if (error()) {
+  <div class="alert alert-danger mt-3">{{ error() }}</div>
+} @else if (product(); as p) {
+  <div class="row g-4 mt-1">
+    <div class="col-12 col-md-6">
+      <div class="product-image product-image-lg rounded"><img [src]="imageOf(p)" [alt]="p.name" /></div>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <h1 class="h3" data-testid="product-name">{{ p.name }}</h1>
+      <p class="text-secondary">{{ p.description || 'Sin descripción.' }}</p>
+
+      <ul class="list-unstyled small mb-3">
+        <li><strong>Categoría:</strong> {{ p.category?.name }}</li>
+        <li><strong>Material:</strong> {{ p.material?.name }}</li>
+        <li><strong>Color:</strong> {{ p.color }}</li>
+        <li><strong>Medidas:</strong> {{ p.width_cm }} × {{ p.height_cm }} cm</li>
+      </ul>
+
+      <p class="h4 mb-1">{{ +p.price | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</p>
+      <p class="mb-3">
+        <span class="badge" [class.text-bg-success]="p.stock > 0" [class.text-bg-warning]="p.stock === 0">
+          {{ p.stock > 0 ? p.stock + ' en stock' : 'A fabricar' }}
+        </span>
+        @if (p.stock === 0) {
+          <span class="small text-secondary ms-2">Se fabrica a pedido (seña del 50 %).</span>
+        }
+      </p>
+
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <input
+          type="number"
+          class="form-control quantity-input"
+          [(ngModel)]="quantity"
+          min="1"
+          max="100"
+          aria-label="Cantidad"
+          data-testid="quantity"
+        />
+        <button type="button" class="btn btn-outline-dark" (click)="addToCart()" data-testid="add-to-cart">Agregar al carrito</button>
+        <button type="button" class="btn btn-dark" (click)="addToCart(true)">Comprar</button>
+      </div>
+
+      @if (added()) {
+        <p class="small text-success mt-2 mb-0" data-testid="added-msg">
+          Agregado. <a routerLink="/cart">Ver carrito</a>
+        </p>
+      }
+    </div>
+  </div>
+}

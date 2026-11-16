@@ -1,0 +1,73 @@
+<section class="hero p-4 p-md-5 mb-4" data-testid="hero">
+  <div class="row align-items-center g-4">
+    <div class="col-12 col-md-7">
+      <h1 class="display-6 mb-2">Aberturas a tu medida</h1>
+      <p class="lead mb-4">Puertas, ventanas y portones de aluminio, PVC, madera y hierro. Pedí online y seguí tu pedido paso a paso.</p>
+      <div class="row g-2 small">
+        <div class="col-12 col-sm-4"><div class="hero-point"><strong>Stock inmediato</strong><br />Seña del 10 %.</div></div>
+        <div class="col-12 col-sm-4"><div class="hero-point"><strong>A fabricar</strong><br />Seña del 50 %.</div></div>
+        <div class="col-12 col-sm-4"><div class="hero-point"><strong>Fecha de entrega</strong><br />Te la confirmamos con la seña.</div></div>
+      </div>
+    </div>
+    <div class="col-md-5 d-none d-md-flex justify-content-center">
+      <img class="hero-art img-fluid" src="/products/ventana-pvc.svg" alt="" />
+    </div>
+  </div>
+</section>
+
+<div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
+  <div>
+    <h1 class="h3 mb-1">Catálogo de aberturas</h1>
+    <p class="text-secondary mb-0">Puertas, ventanas y portones. Los productos sin stock se fabrican a pedido.</p>
+  </div>
+
+  <div class="d-flex flex-wrap align-items-center gap-3">
+    <select class="form-select" [(ngModel)]="categoryId" (ngModelChange)="loadProducts()" aria-label="Filtrar por categoría">
+      <option [ngValue]="null">Todas las categorías</option>
+      @for (category of categories(); track category.id) {
+        <option [ngValue]="category.id">{{ category.name }}</option>
+      }
+    </select>
+
+    <div class="form-check mb-0">
+      <input class="form-check-input" type="checkbox" id="onlyInStock" [(ngModel)]="onlyInStock" (ngModelChange)="loadProducts()" />
+      <label class="form-check-label" for="onlyInStock">Solo con stock</label>
+    </div>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <p class="text-secondary">Cargando…</p>
+} @else if (products().length === 0 && !error()) {
+  <div class="alert alert-light border">No hay productos para mostrar con ese filtro.</div>
+} @else {
+  <div class="row g-3">
+    @for (product of products(); track product.id) {
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="card h-100 shadow-sm" data-testid="product-card">
+          <a [routerLink]="['/products', product.id]" class="product-image"><img [src]="imageOf(product)" [alt]="product.name" loading="lazy" /></a>
+          <div class="card-body d-flex flex-column">
+            <h2 class="h6 card-title"><a [routerLink]="['/products', product.id]" class="text-reset text-decoration-none">{{ product.name }}</a></h2>
+            <p class="small text-secondary mb-2">
+              {{ product.material?.name }} · {{ product.color }} · {{ product.width_cm }} × {{ product.height_cm }} cm
+            </p>
+            <div class="mt-auto d-flex align-items-center justify-content-between">
+              <span class="fw-semibold">{{ +product.price | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+              <span class="badge" [class.text-bg-success]="product.stock > 0" [class.text-bg-warning]="product.stock === 0">
+                {{ product.stock > 0 ? 'En stock' : 'A fabricar' }}
+              </span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-dark mt-3" (click)="addToCart(product)" data-testid="add-card">Agregar al carrito</button>
+            @if (lastAddedId() === product.id) {
+              <p class="small text-success mt-2 mb-0">Agregado. <a routerLink="/cart">Ver carrito</a></p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}
