@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
+import { Permissions } from '../core/models';
 import { AuthService } from '../services/auth';
 
 /** Solo para usuarios con sesión iniciada. */
@@ -52,3 +53,13 @@ export const profileGuard: CanActivateFn = (_route, state) => {
 
   return true;
 };
+
+/** Solo para usuarios que tengan el permiso indicado (los administradores pasan siempre). */
+export const permissionGuard =
+  (permission: keyof Permissions): CanActivateFn =>
+  () => {
+    const auth = inject(AuthService);
+    const router = inject(Router);
+
+    return auth.user() === null || auth.can(permission) ? true : router.createUrlTree(['/']);
+  };

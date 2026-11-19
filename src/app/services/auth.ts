@@ -57,7 +57,14 @@ export class AuthService {
   readonly typeName = computed(() => this.user()?.user_role?.user_type?.name ?? null);
   readonly isAdmin = computed(() => this.roleName() === 'SuperAdmin' || this.roleName() === 'Administrator');
   readonly isSuperAdmin = computed(() => this.roleName() === 'SuperAdmin');
-  readonly isStaff = computed(() => this.isAdmin() || this.typeName() === 'seller');
+  /** Ve el panel de pedidos: administradores y quien tenga el permiso "ver todos los pedidos". */
+  readonly isStaff = computed(() => this.isAdmin() || this.user()?.user_permission?.view_all_orders === true);
+
+  /** Puede comprar: sin sesión se deja armar el carrito; con sesión hace falta el permiso "crear pedidos". */
+  readonly canBuy = computed(() => !this.isLoggedIn() || this.user() === null || this.can('create_orders'));
+
+  /** Puede ver "Mis pedidos" (permiso "ver sus propios pedidos"). */
+  readonly canViewOwnOrders = computed(() => this.user() === null || this.can('view_own_orders'));
 
   /** Los administradores pasan siempre; el resto necesita tener el permiso activado. */
   can(permission: keyof Permissions): boolean {

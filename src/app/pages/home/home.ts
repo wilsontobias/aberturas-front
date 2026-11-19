@@ -7,6 +7,7 @@ import { Category, Product } from '../../core/models';
 import { CartService } from '../../services/cart';
 import { CatalogService } from '../../services/catalog';
 import { productImage } from '../../utils/product-image';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-home',
@@ -16,6 +17,7 @@ import { productImage } from '../../utils/product-image';
 export class Home implements OnInit {
   private catalog = inject(CatalogService);
   private cart = inject(CartService);
+  auth = inject(AuthService);
 
   /** Id del último producto agregado, para mostrar el aviso en su tarjeta. */
   lastAddedId = signal<number | null>(null);

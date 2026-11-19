@@ -41,8 +41,12 @@
           aria-label="Cantidad"
           data-testid="quantity"
         />
-        <button type="button" class="btn btn-outline-dark" (click)="addToCart()" data-testid="add-to-cart">Agregar al carrito</button>
-        <button type="button" class="btn btn-dark" (click)="addToCart(true)">Comprar</button>
+        @if (auth.canBuy()) {
+          <button type="button" class="btn btn-outline-dark" (click)="addToCart()" data-testid="add-to-cart">Agregar al carrito</button>
+          <button type="button" class="btn btn-dark" (click)="addToCart(true)">Comprar</button>
+        } @else {
+          <span class="text-secondary small align-self-center" data-testid="no-buy">Tu cuenta no tiene permiso para crear pedidos.</span>
+        }
       </div>
 
       @if (added()) {

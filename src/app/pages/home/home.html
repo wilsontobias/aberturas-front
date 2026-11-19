@@ -61,7 +61,9 @@
                 {{ product.stock > 0 ? 'En stock' : 'A fabricar' }}
               </span>
             </div>
-            <button type="button" class="btn btn-sm btn-outline-dark mt-3" (click)="addToCart(product)" data-testid="add-card">Agregar al carrito</button>
+            @if (auth.canBuy()) {
+              <button type="button" class="btn btn-sm btn-outline-dark mt-3" (click)="addToCart(product)" data-testid="add-card">Agregar al carrito</button>
+            }
             @if (lastAddedId() === product.id) {
               <p class="small text-success mt-2 mb-0">Agregado. <a routerLink="/cart">Ver carrito</a></p>
             }

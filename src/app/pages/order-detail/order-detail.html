@@ -114,6 +114,14 @@
             <p class="small text-secondary">
               Transferí {{ +o.deposit_amount | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }} y subí el comprobante (JPG, PNG o PDF de hasta 2 MB).
             </p>
+            <div class="payment-info border rounded p-3 mb-3 bg-light" data-testid="payment-info">
+              <div class="fw-semibold mb-1">Datos para transferir</div>
+              <div>Alias: <strong data-testid="pay-alias">{{ paymentInfo.alias }}</strong></div>
+              <div>Titular: {{ paymentInfo.holder }}</div>
+              <div>Banco: {{ paymentInfo.bank }}</div>
+              <div class="small text-secondary">CBU: {{ paymentInfo.cbu }}</div>
+            </div>
+
             <div class="d-flex flex-wrap gap-2 align-items-start">
               <div>
                 <input

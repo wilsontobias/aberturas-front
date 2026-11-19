@@ -44,9 +44,11 @@
           </a>
         </li>
         @if (auth.isLoggedIn()) {
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/orders" routerLinkActive="active" data-testid="orders-link">Mis pedidos</a>
-          </li>
+          @if (auth.canViewOwnOrders()) {
+            <li class="nav-item">
+              <a class="nav-link" routerLink="/orders" routerLinkActive="active" data-testid="orders-link">Mis pedidos</a>
+            </li>
+          }
           <li class="nav-item">
             <span class="navbar-text" data-testid="user-name">{{ auth.user()?.name }}</span>
           </li>

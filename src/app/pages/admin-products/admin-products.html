@@ -1,7 +1,12 @@
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
   <h1 class="h3 mb-0">Productos</h1>
   @if (!showForm()) {
-    <button type="button" class="btn btn-dark" (click)="newProduct()" data-testid="new-product">Nuevo producto</button>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-outline-secondary" (click)="toggleInactive()" data-testid="toggle-inactive">
+        {{ showInactive() ? 'Ocultar desactivados' : 'Ver desactivados (' + inactive().length + ')' }}
+      </button>
+      <button type="button" class="btn btn-dark" (click)="newProduct()" data-testid="new-product">Nuevo producto</button>
+    </div>
   }
 </div>
 
@@ -76,6 +81,17 @@
             <input id="stock" type="number" class="form-control" formControlName="stock" [class.is-invalid]="invalid('stock')" />
             <div class="invalid-feedback">Número entero, 0 o más.</div>
           </div>
+          <div class="col-12 col-md-9">
+            <label for="image" class="form-label">Foto (link a la imagen, opcional)</label>
+            <input id="image" class="form-control" formControlName="image" maxlength="255" placeholder="https://… o /products/mi-foto.jpg" [class.is-invalid]="invalid('image')" data-testid="product-image" />
+            <div class="invalid-feedback">Pegá un link que empiece con http:// o https:// (o una ruta que empiece con /).</div>
+            <div class="form-text">Si lo dejás vacío se muestra una ilustración según el nombre.</div>
+          </div>
+          <div class="col-12 col-md-3">
+            @if (form.controls.image.value && form.controls.image.valid) {
+              <img [src]="form.controls.image.value" alt="Vista previa" class="img-thumbnail" style="max-height: 90px" />
+            }
+          </div>
         </div>
 
         <div class="d-flex gap-2 mt-4">
@@ -127,4 +143,37 @@
       </tbody>
     </table>
   </div>
+}
+
+
+@if (showInactive()) {
+  <h2 class="h5 mt-4 mb-2">Productos desactivados</h2>
+  @if (inactive().length === 0) {
+    <div class="alert alert-light border">No hay productos desactivados.</div>
+  } @else {
+    <div class="table-responsive bg-white border rounded" data-testid="inactive-table">
+      <table class="table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th class="text-end">Precio</th>
+            <th class="text-end">Stock</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of inactive(); track p.id) {
+            <tr data-testid="inactive-row">
+              <td>{{ p.name }}</td>
+              <td class="text-end">{{ +p.price | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</td>
+              <td class="text-end">{{ p.stock }}</td>
+              <td class="text-end">
+                <button type="button" class="btn btn-sm btn-outline-success" (click)="reactivate(p)" data-testid="reactivate-product">Reactivar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
 }

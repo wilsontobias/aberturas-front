@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { adminGuard, authGuard, guestGuard, profileGuard, staffGuard } from './guards/auth.guard';
+import { adminGuard, authGuard, guestGuard, permissionGuard, profileGuard, staffGuard } from './guards/auth.guard';
 import { AdminPermissions } from './pages/admin-permissions/admin-permissions';
 import { AdminProducts } from './pages/admin-products/admin-products';
 import { AdminUsers } from './pages/admin-users/admin-users';
@@ -21,7 +21,7 @@ export const routes: Routes = [
   { path: 'products/:id', component: ProductDetail },
   { path: 'cart', component: Cart },
   { path: 'checkout', component: Checkout, canActivate: [authGuard, profileGuard] },
-  { path: 'orders', component: Orders, canActivate: [authGuard] },
+  { path: 'orders', component: Orders, canActivate: [authGuard, permissionGuard('view_own_orders')] },
   { path: 'orders/:id', component: OrderDetail, canActivate: [authGuard] },
   { path: 'staff/orders', component: StaffOrders, canActivate: [authGuard, staffGuard] },
   { path: 'admin/users', component: AdminUsers, canActivate: [authGuard, adminGuard] },

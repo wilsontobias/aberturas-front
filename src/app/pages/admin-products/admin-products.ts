@@ -6,6 +6,7 @@ import { forkJoin } from 'rxjs';
 import { Category, Product } from '../../core/models';
 import { AdminService, ProductData } from '../../services/admin';
 import { CatalogService, Material } from '../../services/catalog';
+import { productImage } from '../../utils/product-image';
 
 @Component({
   selector: 'app-admin-products',
@@ -29,6 +30,10 @@ export class AdminProducts implements OnInit {
   showForm = signal(false);
   editingId = signal<number | null>(null);
   deactivatingId = signal<number | null>(null);
+  inactive = signal<Product[]>([]);
+  showInactive = signal(false);
+
+  imageOf = productImage;
 
   form = this.fb.group({
     category_id: [null as number | null, [Validators.required]],
@@ -40,6 +45,7 @@ export class AdminProducts implements OnInit {
     color: ['', [Validators.maxLength(50)]],
     price: [null as number | null, [Validators.required, Validators.min(0)]],
     stock: [null as number | null, [Validators.required, Validators.min(0), Validators.pattern(/^\d+$/)]],
+    image: ['', [Validators.maxLength(255), Validators.pattern(/^(https?:\/\/|\/).*/)]],
   });
 
   ngOnInit(): void {
@@ -51,6 +57,7 @@ export class AdminProducts implements OnInit {
         this.categories.set(data.categories);
         this.materials.set(data.materials);
         this.load();
+        this.loadInactive();
       },
       error: () => {
         this.error.set('No se pudieron cargar las categorías y materiales.');
@@ -73,6 +80,28 @@ export class AdminProducts implements OnInit {
     });
   }
 
+  loadInactive(): void {
+    this.admin.getInactiveProducts().subscribe({
+      next: (products) => this.inactive.set(products),
+      error: () => this.inactive.set([]),
+    });
+  }
+
+  toggleInactive(): void {
+    this.showInactive.update((v) => !v);
+    this.ok.set('');
+  }
+
+  reactivate(product: Product): void {
+    this.admin.reactivateProduct(product.id).subscribe({
+      next: () => {
+        this.loadInactive();
+        this.load(() => this.ok.set('Producto reactivado. Ya aparece en el catálogo.'));
+      },
+      error: (err) => this.error.set(err.error?.message ?? 'No se pudo reactivar el producto.'),
+    });
+  }
+
   categoryName(id: number): string {
     return this.categories().find((c) => c.id === id)?.name ?? '';
   }
@@ -89,7 +118,7 @@ export class AdminProducts implements OnInit {
 
   newProduct(): void {
     this.editingId.set(null);
-    this.form.reset({ description: '', color: '' });
+    this.form.reset({ description: '', color: '', image: '' });
     this.formError.set('');
     this.ok.set('');
     this.showForm.set(true);
@@ -107,6 +136,7 @@ export class AdminProducts implements OnInit {
       color: product.color ?? '',
       price: Number(product.price),
       stock: product.stock,
+      image: product.image ?? '',
     });
     this.formError.set('');
     this.ok.set('');
@@ -136,6 +166,7 @@ export class AdminProducts implements OnInit {
       color: v.color?.trim() ? v.color.trim() : null,
       price: Number(v.price),
       stock: Number(v.stock),
+      image: v.image?.trim() ? v.image.trim() : null,
     };
 
     const id = this.editingId();
@@ -170,6 +201,7 @@ export class AdminProducts implements OnInit {
     this.admin.deactivateProduct(product.id).subscribe({
       next: () => {
         this.deactivatingId.set(null);
+        this.loadInactive();
         this.load(() => this.ok.set('Producto desactivado. Ya no aparece en el catálogo.'));
       },
       error: (err) => {

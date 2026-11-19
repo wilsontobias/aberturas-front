@@ -3,6 +3,7 @@ import { CurrencyPipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
+import { PAYMENT_INFO } from '../../core/config';
 import { Locality, Order, Province } from '../../core/models';
 import { AuthService } from '../../services/auth';
 import { CartService } from '../../services/cart';
@@ -17,6 +18,7 @@ import { trimValues } from '../../utils/trim';
 })
 export class Checkout implements OnInit {
   private fb = inject(FormBuilder);
+  paymentInfo = PAYMENT_INFO;
   private catalog = inject(CatalogService);
   private orders = inject(OrderService);
 

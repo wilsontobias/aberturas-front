@@ -7,6 +7,7 @@ import { Product } from '../../core/models';
 import { CartService } from '../../services/cart';
 import { CatalogService } from '../../services/catalog';
 import { productImage } from '../../utils/product-image';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-product-detail',
@@ -18,6 +19,7 @@ export class ProductDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private cart = inject(CartService);
+  auth = inject(AuthService);
 
   product = signal<Product | null>(null);
   loading = signal(true);

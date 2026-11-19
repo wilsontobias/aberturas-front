@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable, forkJoin } from 'rxjs';
 
+import { PAYMENT_INFO } from '../../core/config';
 import { Order, Payment, Tracking } from '../../core/models';
 import { AuthService } from '../../services/auth';
 import { OrderService } from '../../services/orders';
@@ -32,6 +33,7 @@ export class OrderDetail implements OnInit {
   private orders = inject(OrderService);
   private route = inject(ActivatedRoute);
   private auth = inject(AuthService);
+  paymentInfo = PAYMENT_INFO;
 
   order = signal<Order | null>(null);
   tracking = signal<Tracking | null>(null);

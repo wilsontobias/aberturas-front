@@ -15,6 +15,7 @@ export interface ProductData {
   color: string | null;
   price: number;
   stock: number;
+  image?: string | null;
 }
 
 /** Llamadas de los paneles de administración (usuarios, permisos y productos). */
@@ -68,6 +69,14 @@ export class AdminService {
 
   updateProduct(id: number, data: ProductData): Observable<Product> {
     return this.http.put<{ product: Product }>(`${API_URL}/products/${id}`, data).pipe(map((res) => res.product));
+  }
+
+  getInactiveProducts(): Observable<Product[]> {
+    return this.http.get<{ products: Product[] }>(`${API_URL}/inactive-products`).pipe(map((res) => res.products));
+  }
+
+  reactivateProduct(id: number): Observable<unknown> {
+    return this.http.put(`${API_URL}/products/${id}`, { status: true });
   }
 
   deactivateProduct(id: number): Observable<unknown> {

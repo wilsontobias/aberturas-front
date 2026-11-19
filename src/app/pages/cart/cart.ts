@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { CartService } from '../../services/cart';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-cart',
@@ -12,4 +13,5 @@ import { CartService } from '../../services/cart';
 })
 export class Cart {
   cart = inject(CartService);
+  auth = inject(AuthService);
 }
